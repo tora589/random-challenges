@@ -127,130 +127,159 @@
   </main>
 
   <script>
-    function setBackgroundByDay() {
-      const day = new Date().getDay();
+const STORAGE_KEY = "todaysRandomChallenge";
 
-      const colors = [
-        "#ffe5e5",
-        "#fff4cc",
-        "#e5f6ff",
-        "#e8ffe5",
-        "#f3e5ff",
-        "#ffe8d6",
-        "#e5e5ff"
-      ];
+const challengeElement = document.getElementById("challenge");
+const drawButton = document.getElementById("drawButton");
+const completeButton = document.getElementById("completeButton");
+const statusElement = document.getElementById("status");
+const countElement = document.getElementById("count");
 
-      document.body.style.backgroundColor = colors[day];
+let challenges = [];
+let currentData = null;
+
+function setBackgroundByDay() {
+  const colors = [
+    "#ffe5e5",
+    "#fff4cc",
+    "#e5f6ff",
+    "#e8ffe5",
+    "#f3e5ff",
+    "#ffe8d6",
+    "#e5e5ff"
+  ];
+
+  document.body.style.backgroundColor =
+    colors[new Date().getDay()];
+}
+
+function getToday() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
+
+async function loadChallenges() {
+  const response = await fetch("challenges.json");
+
+  if (!response.ok) {
+    throw new Error("challenges.jsonの読み込み失敗");
   }
 
-  let challenges = [];
+  const data = await response.json();
 
-  async function loadchallenges(){
-    const response = await fetch("challenges.json");
-    challenges = await response.json();
+  if (!Array.isArray(data) || data.length === 0) {
+    throw new Error("challenges.jsonが空です");
   }
 
-  setBackgroundByDay();
+  challenges = data;
+}
 
-    const challengeElement = document.getElementById("challenge");
-    const drawButton = document.getElementById("drawButton");
-    const completeButton = document.getElementById("completeButton");
-    const statusElement = document.getElementById("status");
-    const countElement = document.getElementById("count");
+function saveToday() {
+  localStorage.setItem(
+    STORAGE_KEY,
+    JSON.stringify(currentData)
+  );
+}
 
-    const STORAGE_KEY = "todaysRandomChallenge";
+function showTodayChallenge() {
+  challengeElement.textContent =
+    currentData.challenge;
 
-    let currentData = null;
+  drawButton.disabled = true;
 
-    function getToday() {
-      const now = new Date();
-      const year = now.getFullYear();
-      const month = String(now.getMonth() + 1).padStart(2, "0");
-      const day = String(now.getDate()).padStart(2, "0");
-      return `${year}-${month}-${day}`;
+  if (currentData.completed) {
+    statusElement.textContent =
+      "今日のチャレンジは達成済みです。";
+
+    completeButton.disabled = true;
+    countElement.textContent = "今日の達成数：1";
+  } else {
+    statusElement.textContent =
+      "今日はこのチャレンジに挑戦しましょう。";
+
+    completeButton.disabled = false;
+    countElement.textContent = "今日の達成数：0";
+  }
+}
+
+function loadToday() {
+  const saved =
+    localStorage.getItem(STORAGE_KEY);
+
+  if (!saved) {
+    return;
+  }
+
+  try {
+    const data = JSON.parse(saved);
+
+    if (data.date !== getToday()) {
+      localStorage.removeItem(STORAGE_KEY);
+      return;
     }
 
-    function loadToday() {
-      const saved = localStorage.getItem(STORAGE_KEY);
-
-      if (!saved) {
-        return;
-      }
-
-      try {
-        const data = JSON.parse(saved);
-
-        // 昨日のデータならリセット
-        if (data.date !== getToday()) {
-          localStorage.removeItem(STORAGE_KEY);
-          return;
-        }
-
-        currentData = data;
-        showTodayChallenge();
-      } catch (error) {
-        localStorage.removeItem(STORAGE_KEY);
-      }
+    if (!data.challenge) {
+      localStorage.removeItem(STORAGE_KEY);
+      return;
     }
 
-    function saveToday() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(currentData));
-    }
+    currentData = data;
+    showTodayChallenge();
 
-    function showTodayChallenge() {
-      challengeElement.textContent = currentData.challenge;
+  } catch {
+    localStorage.removeItem(STORAGE_KEY);
+  }
+}
 
-      if (currentData.completed) {
-        statusElement.textContent = "今日のチャレンジは達成済みです！";
-        completeButton.disabled = true;
-      } else {
-        statusElement.textContent = "今日はこのチャレンジに挑戦しましょう！";
-        completeButton.disabled = false;
-      }
+drawButton.addEventListener("click", () => {
+  if (currentData) {
+    return;
+  }
 
-      // 1日に1回しか決められない
-      drawButton.disabled = true;
+  const randomIndex =
+    Math.floor(Math.random() * challenges.length);
 
-      countElement.textContent = currentData.completed
-        ? "今日の達成数：1"
-        : "今日の達成数：0";
-    }
+  currentData = {
+    date: getToday(),
+    challenge: challenges[randomIndex],
+    completed: false
+  };
 
-    drawButton.addEventListener("click", () => {
-      // 念のため、すでに決定済みなら何もしない
-      if (currentData) {
-        showTodayChallenge();
-        return;
-      }
+  saveToday();
+  showTodayChallenge();
+});
 
-      const randomIndex = Math.floor(Math.random() * challenges.length);
+completeButton.addEventListener("click", () => {
+  if (!currentData || currentData.completed) {
+    return;
+  }
 
-      currentData = {
-        date: getToday(),
-        challenge: challenges[randomIndex],
-        completed: false
-      };
+  currentData.completed = true;
 
-      saveToday();
-      showTodayChallenge();
-    });
+  saveToday();
+  showTodayChallenge();
+});
 
-    completeButton.addEventListener("click", () => {
-      if (!currentData || currentData.completed) {
-        return;
-      }
+async function init() {
+  try {
+    setBackgroundByDay();
 
-      currentData.completed = true;
-      saveToday();
-      showTodayChallenge();
-    });
+    await loadChallenges();
 
-    // ページを開いたときに今日のデータを復元
-    async function init() {
-      await loadchallenges();
-      loadToday(); 
-    }
-    init();
-  </script>
+    loadToday();
+  } catch (error) {
+    console.error(error);
+
+    statusElement.textContent =
+      "チャレンジデータの読み込みに失敗しました。";
+  }
+}
+
+init();
+</script>
 </body>
 </html>
