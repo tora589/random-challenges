@@ -70,6 +70,7 @@ button:disabled {
 
 .completed-card{
   background:#dcfce7;
+  transition: 0.5s;
 }
 
 .completed-challenge{
@@ -96,6 +97,11 @@ button:disabled {
     <button id="completeButton" class="secondary" disabled>
       達成！
     </button>
+
+    <button>
+      今週の達成状況
+    </button>
+  </a>
 
     <p id="status" class="status">
       1日に1つだけチャレンジできます。
@@ -212,6 +218,21 @@ function loadSavedData() {
   }
 }
 
+function saveHistory(){
+  const HISTORY_KEY="challengeHistory";
+
+  let history=JSON.parse(
+    localStorage.getItem(HISTORY_KEY)||"[]"
+  );
+  history.push({
+    date:currentData.date,
+    challenge:currentData.challenge
+  });
+  localStorage.setItem(
+    HISTORY_KEY,
+    JSON.stringify(history)
+  );
+}
 drawButton.addEventListener("click", () => {
 
   const randomIndex =
@@ -229,11 +250,12 @@ drawButton.addEventListener("click", () => {
 
 completeButton.addEventListener("click", () => {
 
-  if(!currentData) return;
+  if(!currentData||currentData.completed) return;
 
   currentData.completed = true;
 
   saveData();
+  saveHistory();
   displayChallenge();
 });
 
