@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>今週の達成状況</title>
+
+<style>
+body{
+  font-family:sans-serif;
+  max-width:700px;
+  margin:auto;
+  padding:20px;
+}
+
+h1{
+  text-align:center;
+}
+
+.item{
+  padding:15px;
+  margin:10px 0;
+  background:#ecfdf5;
+  border-radius:10px;
+}
+</style>
+
+</head>
+<body>
+
+<h1>今週の達成状況</h1>
+
+<div id="history"></div>
+
+<script>
+
+const historyElement =
+  document.getElementById("history");
+
+const history = JSON.parse(
+  localStorage.getItem("challengeHistory")
+  || "[]"
+);
+
+const oneWeekAgo = new Date();
+
+oneWeekAgo.setDate(
+  oneWeekAgo.getDate() - 7
+);
+
+const weeklyHistory =
+  history.filter(item => {
+
+    return new Date(item.date)
+      >= oneWeekAgo;
+  });
+
+if(weeklyHistory.length === 0){
+
+  historyElement.innerHTML =
+    "<p>達成履歴がありません。</p>";
+
+}else{
+
+  weeklyHistory.forEach(item => {
+
+    historyElement.innerHTML += `
+      <div class="item">
+        ${item.date}<br>
+        ${item.challenge}
+      </div>
+    `;
+  });
+}
+
+</script>
+
+</body>
+</html>
