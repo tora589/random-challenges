@@ -215,9 +215,6 @@ function displayChallenge(){
     statusElement.textContent =
       "今日のチャレンジは達成済みです。";
 
-    countElement.textContent =
-      "今日の達成数：1";
-
     document
       .getElementById("card")
       .classList.add("completed-card");
@@ -228,9 +225,6 @@ function displayChallenge(){
   }else{
 
     completeButton.disabled = false;
-
-    countElement.textContent =
-      "今日の達成数：0";
 
     statusElement.textContent =
       "今日はこのチャレンジに挑戦しましょう。";
