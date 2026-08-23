@@ -141,7 +141,7 @@ button{
 </div>
 
 <button id="drawButton" class="primary">
-今日のチャレンジを決める
+今日のチャレンジ内容
 </button>
 
 <button id="completeButton" class="secondary" disabled>
@@ -156,10 +156,6 @@ button{
 
 <p id="status" class="status">
 1日に1つだけチャレンジできます。
-</p>
-
-<p id="count">
-今日の達成数：0
 </p>
 
 </div>
@@ -247,6 +243,12 @@ function saveHistory(){
 
 function displayChallenge(){
 
+const weeklyCount=
+  getHistoryCount();
+
+countElement.textContent=
+  '${weeklyCount}/7';
+
   challengeElement.textContent =
     currentData.challenge;
 
@@ -312,6 +314,23 @@ function loadToday(){
       STORAGE_KEY
     );
   }
+}
+
+function getHistoryCount(){
+
+  const history = JSON.parse(
+    localStorage.getItem(HISTORY_KEY) || "[]"
+  );
+
+  const oneWeekAgo = new Date();
+
+  oneWeekAgo.setDate(
+    oneWeekAgo.getDate() - 7
+  );
+
+  return history.filter(item =>
+    new Date(item.date) >= oneWeekAgo
+  ).length;
 }
 
 drawButton.addEventListener("click",()=>{
