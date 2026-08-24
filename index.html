@@ -380,7 +380,7 @@ function getHistoryCount(){
   return history.filter(item =>
     new Date(item.date) >= oneWeekAgo
   ).length;
-
+}
   function updateProgressRing(){
 
   const weeklyCount =
@@ -407,7 +407,7 @@ function getHistoryCount(){
   countElement.textContent =
     `${weeklyCount} / 7`;
 }
-}
+
 
 drawButton.addEventListener("click",()=>{
 
