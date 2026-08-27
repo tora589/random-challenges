@@ -361,29 +361,35 @@ updateProgressRing();
 
   if(currentData.completed){
 
-    completeButton.disabled = true;
+  completeButton.disabled = true;
 
-    challengeElement.textContent =
-      "チャレンジ達成！";
+  challengeElement.innerHTML = `
+    <div>
+      ${currentData.challenge}
+    </div>
 
-    challengeElement.classList.add(
-      "completed-challenge"
-    );
+    <div style="
+      margin-top:15px;
+      color:#16a34a;
+      font-weight:bold;
+      font-size:1.2rem;
+    ">
+      チャレンジ達成！
+    </div>
+  `;
 
+  challengeElement.classList.add(
+    "completed-challenge"
+  );
 
-    document
-      .getElementById("card")
-      .classList.add("completed-card");
-
-    challengeElement
-      .classList.add("completed-challenge");
+  document
+    .getElementById("card")
+    .classList.add("completed-card");
 
   }else{
 
-    completeButton.disabled = false;
+  completeButton.disabled = false;
 
-    statusElement.textContent =
-      "今日はこのチャレンジに挑戦しましょう。";
   }
 }
 
