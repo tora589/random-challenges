@@ -204,12 +204,6 @@ button{
 達成！
 </button>
 
-<a href="history.html">
-<button type="button">
-今週の達成状況
-</button>
-</a>
-
 <div class="progress-circle">
 
   <svg width="320"
@@ -268,7 +262,7 @@ button{
   </div>
 
   <div class="history-arrow">
-    タップして確認 →
+    タップして確認 
   </div>
 
 </a>
@@ -372,8 +366,9 @@ updateProgressRing();
     challengeElement.textContent =
       "チャレンジ達成！";
 
-    statusElement.textContent =
-      "今日のチャレンジは達成済みです。";
+    challengeElement.classList.add(
+      "completed-challenge"
+    );
 
 
     document
