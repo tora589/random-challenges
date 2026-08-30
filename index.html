@@ -470,6 +470,15 @@ function getHistoryCount(){
     .getElementById("progressRing")
     .style.strokeDashoffset =
     offset;
+  if(weeklyCount>=7){
+    document
+    .getElementById("progressRing")
+    .style.stroke="#22c55e";
+  }else{
+    document
+    .getElementById("progressRIng")
+    .style.stroke="#59a9d8";
+  }
 
   countElement.textContent =
     `${weeklyCount} / 7`;
@@ -478,6 +487,8 @@ function getHistoryCount(){
     "historyProgress"
   ).textContent =
     `${weeklyCount} / 7日達成`;
+
+  
 }
 
 
